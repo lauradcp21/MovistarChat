@@ -5,523 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MovistarChat · Cliente Movistar España</title>
   <style>
-    :root {
-      --movistar-red: #e60000;
-      --movistar-dark: #0e1d2d;
-      --movistar-mid: #1e2d3d;
-      --movistar-soft: #f3f6fb;
-      --line: #dfe7f1;
-      --text: #1a2430;
-      --muted: #617487;
-      --green: #18b77c;
-      --white: #ffffff;
-      --shadow: 0 12px 28px rgba(20, 24, 38, 0.12);
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; font-family: Inter, Arial, sans-serif; background: linear-gradient(180deg, #eef4fb 0%, #f7f9fc 100%); color: var(--text); }
-    body { display: flex; justify-content: center; align-items: center; padding: 24px; }
-    .app {
-      width: min(1200px, 100%);
-      min-height: 900px;
-      display: grid;
-      grid-template-columns: 330px minmax(0, 1fr);
-      background: var(--white);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      border: 1px solid var(--line);
-    }
-    .sidebar {
-      background: linear-gradient(180deg, #0a2038 0%, #12273d 100%);
-      color: var(--white);
-      padding: 22px 18px;
-    }
-    .brand {
-      display: flex; align-items: center; gap: 14px; margin-bottom: 22px;
-    }
-    .brand-icon {
-      width: 44px; height: 44px; border-radius: 16px;
-      display: grid; place-items: center; font-weight: 800;
-      background: linear-gradient(135deg, var(--movistar-red), #ff3f3f);
-      color: white;
-      font-size: 22px;
-    }
-    .brand h1 { margin: 0; font-size: 1.5rem; }
-    .brand p { margin: 4px 0 0; color: rgba(255,255,255,.7); font-size: .86rem; }
-    .section-title {
-      margin: 18px 0 10px;
-      color: rgba(255,255,255,.72);
-      font-size: .74rem;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 10px;
-    }
-    .category {
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.04);
-      color: white;
-      border-radius: 14px;
-      padding: 12px 10px;
-      text-align: left;
-      cursor: pointer;
-      transition: .2s ease;
-      font-size: .95rem;
-    }
-    .category.active {
-      background: rgba(255,255,255,.12);
-      border-color: rgba(255,255,255,.35);
-    }
-    .category span { display: block; font-size: 1.3rem; margin-bottom: 6px; }
-    .sidebar-actions {
-      margin-top: 18px; display: flex; flex-direction: column; gap: 10px;
-    }
-    .btn {
-      border: none; border-radius: 12px; padding: 12px 16px; font-weight: 700; cursor: pointer;
-      transition: transform .15s ease, opacity .15s ease;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn.primary { background: var(--movistar-red); color: white; }
-    .btn.secondary { background: rgba(255,255,255,.08); color: white; border: 1px solid rgba(255,255,255,.12); }
-    .chat {
-      display: flex; flex-direction: column; min-width: 0;
-      background: #f7f9fc;
-    }
-    .chat-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 24px 18px; border-bottom: 1px solid var(--line);
-      background: white;
-    }
-    .contact {
-      display: flex; align-items: center; gap: 14px;
-    }
-    .avatar {
-      width: 42px; height: 42px; border-radius: 50%;
-      background: linear-gradient(135deg, #e60000, #ff5c5c);
-      color: white; display: grid; place-items: center; font-weight: 800;
-    }
-    .contact strong { display: block; font-size: 1.1rem; }
-    .status { font-size: .78rem; color: var(--muted); }
-    .turn-pill {
-      padding: 7px 12px; border-radius: 999px; background: #eef4ff; color: #1f4b99; font-weight: 700; font-size: .8rem;
-    }
-    .chat-body {
-      flex: 1; padding: 22px 20px 10px; overflow: auto; background: linear-gradient(180deg, #f5f9ff 0%, #f4f7fa 100%);
-    }
-    .welcome {
-      max-width: 560px; margin: 10px auto 14px; text-align: center; background: rgba(255,255,255,.6); padding: 22px; border-radius: 16px; border: 1px solid var(--line);
-    }
-    .welcome h2 { margin: 0 0 10px; color: var(--movistar-dark); }
-    .welcome p { margin: 0; color: var(--muted); line-height: 1.6; }
-    .message-row {
-      display: flex; margin: 18px 0; align-items: flex-end;
-    }
-    .message-row.customer { justify-content: flex-start; }
-    .message-row.agent { justify-content: flex-end; }
-    .bubble {
-      max-width: min(76%, 720px);
-      padding: 12px 14px 10px; border-radius: 16px;
-      background: white; border: 1px solid var(--line); box-shadow: 0 5px 18px rgba(0,0,0,.04);
-      white-space: pre-wrap; line-height: 1.5; font-size: .98rem;
-    }
-    .message-row.customer .bubble { border-bottom-left-radius: 6px; }
-    .message-row.agent .bubble { background: #eaf8f1; border-color: #d7efe4; border-bottom-right-radius: 6px; }
-    .time {
-      font-size: .72rem; color: var(--muted); margin-top: 6px; display: block;
-    }
-    .composer {
-      border-top: 1px solid var(--line); background: rgba(255,255,255,.9); padding: 16px 20px 18px;
-    }
-    .composer-row {
-      display: flex; gap: 12px; align-items: flex-end;
-    }
-    textarea {
-      flex: 1; min-height: 58px; max-height: 160px; resize: vertical; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: white; font: inherit; outline: none;
-    }
-    textarea:focus { border-color: #a7c7ff; box-shadow: 0 0 0 3px rgba(43, 92, 179, 0.08); }
-    .send-btn {
-      width: 52px; height: 52px; border-radius: 16px; border: none; background: linear-gradient(135deg, var(--movistar-red), #ff4c4c); color: white; font-size: 1.3rem; cursor: pointer;
-    }
-    .bottom-bar {
-      display: flex; justify-content: space-between; align-items: center; margin-top: 12px; color: var(--muted); font-size: .82rem;
-    }
-    .hidden { display: none !important; }
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(13,17,26,.42); display: grid; place-items: center; padding: 20px; z-index: 99;
-    }
-    .modal {
-      width: min(560px, 100%); background: white; border-radius: 20px; padding: 22px 20px 18px; box-shadow: var(--shadow);
-    }
-    .modal h2 { margin: 0 0 8px; }
-    .modal p { color: var(--muted); line-height: 1.6; }
-    .field { margin-top: 16px; }
-    .field label { display: block; margin-bottom: 8px; font-weight: 700; }
-    .field input {
-      width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; font: inherit; background: #f9fbff;
-    }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
-    .toast {
-      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-      background: rgba(18, 28, 38, 0.94); color: white; padding: 10px 16px; border-radius: 999px; font-size: .9rem; box-shadow: var(--shadow);
-    }
-    @media (max-width: 840px) {
-      .app { grid-template-columns: 1fr; }
-      .sidebar { padding-bottom: 12px; }
-      .category-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .bubble { max-width: 88%; }
-    }
+    :root{--movistar-red:#e60000;--movistar-dark:#0e1d2d;--line:#dfe7f1;--text:#1a2430;--muted:#617487;--white:#fff;--shadow:0 12px 28px rgba(20,24,38,.12)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,#eef4fb,#f7f9fc);color:var(--text)}body{display:flex;justify-content:center;align-items:center;padding:24px}.app{width:min(1200px,100%);min-height:900px;display:grid;grid-template-columns:330px minmax(0,1fr);background:#fff;border-radius:22px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--line)}.sidebar{background:linear-gradient(180deg,#0a2038,#12273d);color:#fff;padding:22px 18px}.brand{display:flex;align-items:center;gap:14px;margin-bottom:22px}.brand-icon{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,#e60000,#ff3f3f);font-size:22px}.brand h1{margin:0;font-size:1.5rem}.brand p{margin:4px 0 0;color:#ffffffb3;font-size:.86rem}.section-title{margin:18px 0 10px;color:#ffffffb8;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase}.category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.category{border:1px solid #ffffff24;background:#ffffff0a;color:#fff;border-radius:14px;padding:12px 10px;text-align:left;cursor:pointer;transition:.2s;font-size:.95rem}.category.active{background:#ffffff1f;border-color:#ffffff59}.category span{display:block;font-size:1.3rem;margin-bottom:6px}.sidebar-actions{margin-top:18px;display:flex;flex-direction:column;gap:10px}.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;transition:transform .15s,opacity .15s}.btn:hover{transform:translateY(-1px)}.btn.primary{background:#e60000;color:#fff}.btn.secondary{background:#ffffff14;color:#fff;border:1px solid #ffffff1f}.chat{display:flex;flex-direction:column;min-width:0;background:#f7f9fc}.chat-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 18px;border-bottom:1px solid var(--line);background:#fff}.contact{display:flex;align-items:center;gap:14px}.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#e60000,#ff5c5c);color:#fff;display:grid;place-items:center;font-weight:800}.contact strong{display:block;font-size:1.1rem}.status{font-size:.78rem;color:var(--muted)}.turn-pill{padding:7px 12px;border-radius:999px;background:#eef4ff;color:#1f4b99;font-weight:700;font-size:.8rem}.chat-body{flex:1;padding:22px 20px 10px;overflow:auto;background:linear-gradient(180deg,#f5f9ff,#f4f7fa)}.welcome{max-width:560px;margin:10px auto 14px;text-align:center;background:#ffffff99;padding:22px;border-radius:16px;border:1px solid var(--line)}.welcome h2{margin:0 0 10px;color:var(--movistar-dark)}.welcome p{margin:0;color:var(--muted);line-height:1.6}.message-row{display:flex;margin:18px 0;align-items:flex-end}.message-row.customer{justify-content:flex-start}.message-row.agent{justify-content:flex-end}.bubble{max-width:min(76%,720px);padding:12px 14px 10px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 5px 18px #0000000a;white-space:pre-wrap;line-height:1.5;font-size:.98rem}.message-row.customer .bubble{border-bottom-left-radius:6px}.message-row.agent .bubble{background:#eaf8f1;border-color:#d7efe4;border-bottom-right-radius:6px}.time{font-size:.72rem;color:var(--muted);margin-top:6px;display:block}.composer{border-top:1px solid var(--line);background:#ffffffe6;padding:16px 20px 18px}.composer-row{display:flex;gap:12px;align-items:flex-end}textarea{flex:1;min-height:58px;max-height:160px;resize:vertical;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:#fff;font:inherit;outline:none}textarea:focus{border-color:#a7c7ff;box-shadow:0 0 0 3px #2b5cb314}.send-btn{width:52px;height:52px;border-radius:16px;border:0;background:linear-gradient(135deg,#e60000,#ff4c4c);color:#fff;font-size:1.3rem;cursor:pointer}.bottom-bar{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted);font-size:.82rem}.bottom-bar .btn.secondary{color:var(--muted);background:#f3f6fb;border-color:var(--line)}.hidden{display:none!important}.modal-backdrop{position:fixed;inset:0;background:#0d111a6b;display:grid;place-items:center;padding:20px;z-index:99}.modal{width:min(560px,100%);background:#fff;border-radius:20px;padding:22px 20px 18px;box-shadow:var(--shadow)}.modal h2{margin:0 0 8px}.modal p{color:var(--muted);line-height:1.6}.field{margin-top:16px}.field label{display:block;margin-bottom:8px;font-weight:700}.field input{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit;background:#f9fbff}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}.modal-actions .btn.secondary{color:var(--muted);background:#f3f6fb;border-color:var(--line)}.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#121c26f0;color:#fff;padding:10px 16px;border-radius:999px;font-size:.9rem;box-shadow:var(--shadow);z-index:100}@media(max-width:840px){.app{grid-template-columns:1fr}.sidebar{padding-bottom:12px}.category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bubble{max-width:88%}}
   </style>
 </head>
 <body>
   <main class="app">
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-icon">M</div>
-        <div>
-          <h1>MovistarChat</h1>
-          <p>Atención al cliente</p>
-        </div>
-      </div>
-
-      <div class="section-title">Tipo de caso</div>
-      <div id="categories" class="category-grid"></div>
-
-      <div class="sidebar-actions">
-        <button id="startBtn" class="btn primary">Nuevo caso</button>
-        <button id="settingsBtn" class="btn secondary">Configurar IA</button>
-      </div>
+      <div class="brand"><div class="brand-icon">M</div><div><h1>MovistarChat</h1><p>Atención al cliente</p></div></div>
+      <div class="section-title">Tipo de caso</div><div id="categories" class="category-grid"></div>
+      <div class="sidebar-actions"><button id="startBtn" class="btn primary">Nuevo caso</button><button id="settingsBtn" class="btn secondary">Configurar IA</button></div>
     </aside>
-
     <section class="chat">
-      <header class="chat-header">
-        <div class="contact">
-          <div class="avatar">M</div>
-          <div>
-            <strong id="chatContact">Movistar España · Cliente</strong>
-            <div id="status" class="status">IA local sin clave</div>
-          </div>
-        </div>
-        <div id="turnPill" class="turn-pill">0 / 20 turnos</div>
-      </header>
-
-      <div class="chat-body">
-        <div id="welcome" class="welcome">
-          <h2>Practica conversaciones reales con clientes de Movistar España</h2>
-          <p>Este simulador actúa como un cliente ficticio de Movistar España. Habla de facturas, fibra, contrataciones, reclamaciones y soporte técnico con un tono natural.</p>
-        </div>
-        <div id="messages"></div>
-      </div>
-
-      <footer class="composer">
-        <div class="composer-row">
-          <textarea id="messageInput" placeholder="Escribe tu respuesta..." rows="2"></textarea>
-          <button id="sendBtn" class="send-btn" aria-label="Enviar">➤</button>
-        </div>
-        <div class="bottom-bar">
-          <span>Práctica ficticia: no afecta a cuentas reales.</span>
-          <button id="finishBtn" class="btn secondary">Finalizar</button>
-        </div>
-      </footer>
+      <header class="chat-header"><div class="contact"><div class="avatar">M</div><div><strong id="chatContact">Movistar España · Cliente</strong><div id="status" class="status">IA local sin clave</div></div></div><div id="turnPill" class="turn-pill">0 / 20 turnos</div></header>
+      <div class="chat-body" id="chatBody"><div id="welcome" class="welcome"><h2>Practica conversaciones reales con clientes de Movistar España</h2><p>Este simulador actúa como un cliente ficticio de Movistar España. Habla de facturas, fibra, contrataciones, reclamaciones y soporte técnico con un tono natural.</p></div><div id="messages"></div></div>
+      <footer class="composer"><div class="composer-row"><textarea id="messageInput" placeholder="Escribe tu respuesta..." rows="2"></textarea><button id="sendBtn" class="send-btn" aria-label="Enviar">➤</button></div><div class="bottom-bar"><span>Práctica ficticia: no afecta a cuentas reales.</span><button id="finishBtn" class="btn secondary">Finalizar</button></div></footer>
     </section>
   </main>
-
-  <div id="settingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-    <div class="modal">
-      <h2 id="settingsTitle">Opciones de IA</h2>
-      <p>Activa la IA para que el cliente responda con un tono realista basado en Movistar España.</p>
-
-      <div class="field">
-        <label for="endpointInput">Endpoint</label>
-        <input id="endpointInput" type="text" value="https://api.openai.com/v1/chat/completions" placeholder="https://api.openai.com/v1/chat/completions">
-      </div>
-
-      <div class="field">
-        <label for="modelInput">Modelo</label>
-        <input id="modelInput" type="text" value="gpt-4o-mini" placeholder="gpt-4o-mini">
-      </div>
-
-      <div class="field">
-        <label for="keyInput">Clave API</label>
-        <input id="keyInput" type="password" value="" placeholder="sk-...">
-      </div>
-
-      <div class="modal-actions">
-        <button id="cancelSettings" class="btn secondary">Cerrar</button>
-        <button id="saveSettings" class="btn primary">Guardar</button>
-      </div>
-    </div>
-  </div>
-
+  <div id="settingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="modal"><h2 id="settingsTitle">Opciones de IA</h2><p>Activa la IA para que el cliente responda con un tono realista basado en Movistar España.</p><div class="field"><label for="endpointInput">Endpoint</label><input id="endpointInput" type="text" value="https://api.openai.com/v1/chat/completions" placeholder="https://api.openai.com/v1/chat/completions"></div><div class="field"><label for="modelInput">Modelo</label><input id="modelInput" type="text" value="gpt-4o-mini" placeholder="gpt-4o-mini"></div><div class="field"><label for="keyInput">Clave API</label><input id="keyInput" type="password" placeholder="sk-..."></div><div class="modal-actions"><button id="cancelSettings" class="btn secondary">Cerrar</button><button id="saveSettings" class="btn primary">Guardar</button></div></div></div>
   <div id="toast" class="toast hidden"></div>
-
   <script>
-    const categories = [
-      ['ventas', '🛍️', 'Ventas'],
-      ['factura', '🧾', 'Facturas'],
-      ['reclamacion', '⚖️', 'Reclamaciones'],
-      ['pedidos', '📦', 'Pedidos'],
-      ['molesto', '😤', 'Cliente molesto'],
-      ['averia', '📡', 'Averías']
-    ];
-
-    const scenarios = {
-      ventas: {
-        title: 'Consulta de venta',
-        description: 'Un cliente quiere contratar fibra y móvil, pero necesita aclarar el precio final y las condiciones.',
-        opening: 'Hola, estoy mirando opciones de fibra y móvil. Me gustaría comparar precio, permanencia y si hay alguna promoción válida para mí.',
-        goal: 'El cliente quiere entender bien el coste total y si merece la pena cambiarse a Movistar España.'
-      },
-      factura: {
-        title: 'Duda sobre la factura',
-        description: 'El cliente no entiende un cargo extra en la factura de Movistar y quiere revisarlo.',
-        opening: 'He visto un importe en mi factura que no me coincide. Quiero saber si es un cargo por servicio, por penalización o si hay un error.',
-        goal: 'Entender el motivo del cargo y pedir una explicación clara.'
-      },
-      reclamacion: {
-        title: 'Reclamación',
-        description: 'El cliente considera que el servicio no ha cumplido lo esperado y quiere reclamar.',
-        opening: 'Llevo varios días con un problema y me siento muy frustrado porque no me han resuelto nada. Quiero una solución clara.',
-        goal: 'Pedir una solución concreta y sentir que se le escucha.'
-      },
-      pedidos: {
-        title: 'Pedido y entrega',
-        description: 'El cliente quiere confirmar un pedido y saber cuándo llegará el equipo o la instalación.',
-        opening: 'He pedido una línea nueva y quiero confirmar la fecha de entrega y si me van a avisar antes de la instalación.',
-        goal: 'Asegurarse de que el pedido está bien gestionado y con plazos claros.'
-      },
-      molesto: {
-        title: 'Cliente molesto',
-        description: 'El cliente está enfadado por varios fallos y exige una atención rápida.',
-        opening: 'Estoy muy enfadado porque llevo varios días intentando resolver esto y nadie me da una solución real. Necesito que me ayuden ya.',
-        goal: 'Manifestar frustración y exigir una respuesta rápida y eficaz.'
-      },
-      averia: {
-        title: 'Avería y soporte',
-        description: 'El cliente reporta un problema de cobertura o conectividad y necesita apoyo técnico.',
-        opening: 'La conexión va muy lenta y hay días que ni me deja usar el móvil. Necesito que revisen si hay una avería o si me toca pasar por un diagnóstico.',
-        goal: 'Pedir una revisión técnica y entender cuál será el siguiente paso.'
-      }
+    const categories=[['ventas','🛍️','Ventas'],['factura','🧾','Facturas'],['reclamacion','⚖️','Reclamaciones'],['pedidos','📦','Pedidos'],['molesto','😤','Cliente molesto'],['averia','📡','Averías']];
+    const scenarios={
+      ventas:{title:'Consulta de venta',description:'Un cliente quiere contratar fibra y móvil, pero necesita aclarar el precio final y las condiciones.',opening:'Hola, estoy mirando opciones de fibra y móvil. Me gustaría comparar precio, permanencia y si hay alguna promoción válida para mí.',goal:'El cliente quiere entender bien el coste total y si merece la pena cambiarse a Movistar España.'},
+      factura:{title:'Duda sobre la factura',description:'El cliente no entiende un cargo extra en la factura de Movistar y quiere revisarlo.',opening:'He visto un importe en mi factura que no me coincide. Quiero saber si es un cargo por servicio, por penalización o si hay un error.',goal:'Entender el motivo del cargo y pedir una explicación clara.'},
+      reclamacion:{title:'Reclamación',description:'El cliente considera que el servicio no ha cumplido lo esperado y quiere reclamar.',opening:'Llevo varios días con un problema y me siento muy frustrado porque no me han resuelto nada. Quiero una solución clara.',goal:'Pedir una solución concreta y sentir que se le escucha.'},
+      pedidos:{title:'Pedido y entrega',description:'El cliente quiere confirmar un pedido y saber cuándo llegará el equipo o la instalación.',opening:'He pedido una línea nueva y quiero confirmar la fecha de entrega y si me van a avisar antes de la instalación.',goal:'Asegurarse de que el pedido está bien gestionado y con plazos claros.'},
+      molesto:{title:'Cliente molesto',description:'El cliente está enfadado por varios fallos y exige una atención rápida.',opening:'Estoy muy enfadado porque llevo varios días intentando resolver esto y nadie me da una solución real. Necesito que me ayuden ya.',goal:'Manifestar frustración y exigir una respuesta rápida y eficaz.'},
+      averia:{title:'Avería y soporte',description:'El cliente reporta un problema de cobertura o conectividad y necesita apoyo técnico.',opening:'La conexión va muy lenta y hay días que ni me deja usar el móvil. Necesito que revisen si hay una avería o si me toca pasar por un diagnóstico.',goal:'Pedir una revisión técnica y entender cuál será el siguiente paso.'}
     };
-
-    const names = ['Lucía García', 'Carlos López', 'María Martín', 'Javier Sánchez', 'Elena Pérez', 'David Gómez'];
-
-    const state = {
-      category: 'ventas',
-      scenario: null,
-      messages: [],
-      turns: 0,
-      target: 12,
-      api: null,
-      mode: 'local',
-      busy: false,
-      active: false
-    };
-
-    const $ = (selector) => document.querySelector(selector);
-
-    function toast(msg) {
-      const t = $('#toast');
-      t.textContent = msg;
-      t.classList.remove('hidden');
-      clearTimeout(toast.timer);
-      toast.timer = setTimeout(() => t.classList.add('hidden'), 4000);
-    }
-
-    function drawCategories() {
-      $('#categories').innerHTML = categories.map(([id, icon, label]) => `
-        <button class="category ${state.category === id ? 'active' : ''}" data-cat="${id}">
-          <span>${icon}</span><b>${label}</b>
-        </button>
-      `).join('');
-
-      document.querySelectorAll('.category').forEach((btn) => {
-        btn.onclick = () => {
-          state.category = btn.dataset.cat;
-          drawCategories();
-          newCase();
-        };
-      });
-    }
-
-    function addMessage(role, text) {
-      const row = document.createElement('div');
-      row.className = `message-row ${role}`;
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.textContent = text;
-      const time = document.createElement('span');
-      time.className = 'time';
-      time.textContent = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' }).format(new Date());
-      bubble.appendChild(time);
-      row.appendChild(bubble);
-      $('#messages').appendChild(row);
-      $('#messages').scrollTop = $('#messages').scrollHeight;
-    }
-
-    function updateTurns() {
-      $('#turnPill').textContent = `${state.turns} / 20 turnos`;
-      $('#finishBtn').disabled = !state.active || state.busy || state.turns < state.target;
-    }
-
-    function getApi() {
-      try {
-        return JSON.parse(sessionStorage.getItem('movistarchat_api') || 'null');
-      } catch {
-        return null;
+    const names=['Lucía García','Carlos López','María Martín','Javier Sánchez','Elena Pérez','David Gómez'];
+    const state={category:'ventas',scenario:null,messages:[],turns:0,target:12,api:null,mode:'local',busy:false,active:false};
+    const $=s=>document.querySelector(s);
+    function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.add('hidden'),4000)}
+    function drawCategories(){$('#categories').innerHTML=categories.map(([id,icon,label])=>`<button class="category ${state.category===id?'active':''}" data-cat="${id}"><span>${icon}</span><b>${label}</b></button>`).join('');document.querySelectorAll('.category').forEach(btn=>btn.onclick=()=>{state.category=btn.dataset.cat;drawCategories();newCase()})}
+    function addMessage(role,text){const row=document.createElement('div');row.className=`message-row ${role}`;const bubble=document.createElement('div');bubble.className='bubble';bubble.textContent=text;const time=document.createElement('span');time.className='time';time.textContent=new Intl.DateTimeFormat('es-ES',{hour:'2-digit',minute:'2-digit'}).format(new Date());bubble.appendChild(time);row.appendChild(bubble);$('#messages').appendChild(row);$('#chatBody').scrollTop=$('#chatBody').scrollHeight}
+    function updateTurns(){$('#turnPill').textContent=`${state.turns} / 20 turnos`;$('#finishBtn').disabled=!state.active||state.busy||state.turns<state.target}
+    function getApi(){try{return JSON.parse(sessionStorage.getItem('movistarchat_api')||'null')}catch{return null}}
+    function customerSystemPrompt(){const s=state.scenario;return `Eres ${s.name}, un cliente ficticio de Movistar España en una conversación de atención comercial. Tu interlocutor es el comercial (nosotros), no tú. Responde siempre como cliente en primera persona y exclusivamente a lo último que el comercial haya preguntado o explicado, teniendo en cuenta toda la conversación anterior. Conversa con fluidez, naturalidad y variedad: reconoce la información que te dan, contesta las preguntas, aclara dudas pendientes y haz una pregunta de seguimiento solo si viene al caso. No repitas la misma frase ni vuelvas al inicio. Mantén una personalidad coherente con el caso y expresa satisfacción, reserva o frustración de forma gradual según la respuesta recibida. Si el comercial resuelve tu duda, agradécelo o confirma que queda claro; si no responde lo que preguntaste, insiste educadamente en el punto concreto. No inventes datos personales, números de cuenta, precios, condiciones ni gestiones que no se hayan confirmado: pregunta cuando falte información. Mensajes breves, de 1 a 3 frases, en español natural de España. Nunca actúes como comercial ni como asistente. Caso: ${s.title}. Contexto: ${s.description}. Objetivo del cliente: ${s.goal}.`}
+    function fallbackReply(){const s=state.scenario, last=state.messages.at(-1)?.content||'', t=last.toLocaleLowerCase('es');const question=/[¿?]/.test(last);const has=(...words)=>words.some(w=>t.includes(w));
+      if(has('gracias','disculpa','lo siento','entiendo tu','entiendo que'))return 'Gracias por entenderlo. ¿Me puedes ayudar entonces con lo que te comentaba?';
+      if(s===scenarios.ventas||state.category==='ventas'){
+        if(has('precio','euros','€/','al mes','mensual','cuesta','coste','tarifa','oferta','promoción','descuento'))return 'Vale, gracias por aclararme el precio. ¿Ese importe se mantiene después de la promoción y qué permanencia tendría?';
+        if(has('permanencia','sin permanencia','meses','compromiso'))return 'Entiendo. Y si más adelante quisiera darme de baja o cambiar de tarifa, ¿tendría algún coste?';
+        if(has('fibra','velocidad','móvil','datos','línea'))return 'Eso me encaja. ¿Me podrías concretar también qué incluye exactamente el paquete y el precio final con todo incluido?';
       }
+      if(state.category==='factura'&&has('cargo','concepto','factura','importe','recibo','revis'))return 'De acuerdo, ahora entiendo un poco mejor. ¿Me puedes indicar a qué periodo corresponde ese cargo y si se va a repetir en la próxima factura?';
+      if(state.category==='pedidos'&&has('fecha','día','entrega','instal','pedido','aviso','plazo'))return 'Perfecto, gracias. ¿Me avisarán con antelación y hay alguna forma de consultar el estado del pedido?';
+      if((state.category==='averia'||state.category==='reclamacion'||state.category==='molesto')&&has('revis','diagnóstico','incidencia','avería','técnic','solución','visita','plazo','gestión'))return 'De acuerdo, agradezco que lo reviséis. ¿Qué tengo que hacer ahora y en qué plazo debería tener una respuesta o solución?';
+      if(question){if(has('cuándo','cuando','fecha','día','plazo'))return 'No tengo una fecha concreta todavía. ¿Me puedes indicar qué plazo aproximado manejáis?';if(has('cuánto','cuanto','precio','coste','importe'))return 'Aún no tengo claro el importe exacto. ¿Me lo puedes confirmar con todos los conceptos incluidos?';return 'Pues lo que más me preocupa es que quede resuelto y saber qué pasos tengo que seguir. ¿Me lo puedes concretar un poco más?'}
+      if(has('puedo ayudarte','qué necesitas','que necesitas','qué puedo','que puedo'))return `Gracias. ${s.goal} ¿Me puedes explicar qué opciones tengo en este caso?`;
+      if(has('solucionado','resuelto','correcto','confirmo','he gestionado','queda hecho'))return 'Perfecto, gracias por gestionarlo. ¿Me confirmas si tengo que hacer algo más o ya queda todo resuelto?';
+      if(state.category==='molesto'||state.category==='reclamacion')return 'Entiendo lo que me dices, pero llevo tiempo esperando una solución. ¿Podrías indicarme un paso concreto y cuándo se resolvería?';
+      return 'Vale, te sigo. ¿Me puedes dar un poco más de detalle para asegurarme de que lo he entendido bien?';
     }
-
-    function customerSystemPrompt() {
-      const s = state.scenario;
-      return `Eres exclusivamente ${s.name}, un cliente ficticio de Movistar España. No eres el comercial ni el asistente. Responde como un cliente realista, con tono natural y con dudas, que trabaja con Movistar España en situaciones de atención al cliente. Debes hablar en español de España y mantener un estilo cercano, claro y a veces preocupado, según el caso. No reveles que eres una IA ni que estás dentro de un simulador. Haz preguntas concretas si hace falta, y responde con un máximo de 3 frases por mensaje. Si te piden una solución, pide una explicación clara y concreta. Caso: ${s.title}. Descripción: ${s.description}. Objetivo: ${s.goal}.`;
-    }
-
-    function fallbackReply(text) {
-      const t = text.toLowerCase();
-      if (/(factur|cargo|importe|precio|cuesta|tarifa)/.test(t)) return 'Entiendo lo que me preocupa. Me gustaría que me explicaran exactamente qué concepto aparece en mi factura y si hay algún cargo adicional o penalización.';
-      if (/(fibra|móvil|contrat|oferta|promo|permanencia)/.test(t)) return 'Quiero que me lo expliquen bien, sin rodeos. ¿Cuánto me costaría al mes y cuánto duraría la permanencia?';
-      if (/(reclam|incid|averi|cobertura|conexi|internet)/.test(t)) return 'Eso me preocupa bastante. Necesito saber si es una avería real, cuánto tardan en revisarlo y qué solución me ofrecen.';
-      if (/(pedido|instal|envio|entrega|fecha)/.test(t)) return 'Necesito una fecha concreta y confirmación del proceso. ¿Me avisarán antes de la instalación o entrega?';
-      if (/(molest|frustr|enfad|nada|nadie)/.test(t)) return 'Estoy muy descontento con esto. Necesito una respuesta clara y una solución que me convenza.';
-      return 'Entiendo, pero necesito que me lo expliquen con claridad y con una solución concreta para poder decidir.';
-    }
-
-    async function localAIReply(text) {
-      const system = customerSystemPrompt();
-      const prompt = `${system}\nCliente: ${text}`;
-      return fallbackReply(prompt);
-    }
-
-    async function remoteAIReply(text) {
-      const api = state.api;
-      if (!api) throw new Error('Configura el endpoint, modelo y clave API.');
-
-      const response = await fetch(api.endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${api.key}`
-        },
-        body: JSON.stringify({
-          model: api.model,
-          messages: [
-            { role: 'system', content: customerSystemPrompt() },
-            { role: 'user', content: text }
-          ],
-          temperature: 0.8,
-          max_tokens: 180
-        })
-      });
-
-      if (!response.ok) throw new Error(`API error: ${response.status}`);
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content?.trim();
-      if (!content) throw new Error('La API no devolvió texto.');
-      return content;
-    }
-
-    function newCase() {
-      const s = scenarios[state.category];
-      state.scenario = { ...s, name: names[Math.floor(Math.random() * names.length)] };
-      state.messages = [];
-      state.turns = 0;
-      state.active = true;
-      $('#welcome').classList.add('hidden');
-      $('#messages').innerHTML = '';
-      addMessage('customer', state.scenario.opening);
-      state.turns = 1;
-      updateTurns();
-      toast('Nuevo caso preparado.');
-    }
-
-    async function sendMessage() {
-      if (!state.active || state.busy) return;
-      const input = $('#messageInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      addMessage('agent', text);
-      input.value = '';
-      state.busy = true;
-      state.turns += 1;
-      updateTurns();
-
-      let reply = '';
-      try {
-        reply = state.mode === 'remote' ? await remoteAIReply(text) : await localAIReply(text);
-      } catch (e) {
-        reply = fallbackReply(text);
-      }
-
-      addMessage('customer', reply);
-      state.busy = false;
-      updateTurns();
-      if (state.turns >= 20) {
-        toast('Conversación finalizada.');
-      }
-    }
-
-    function saveSettings() {
-      const endpoint = $('#endpointInput').value.trim();
-      const model = $('#modelInput').value.trim();
-      const key = $('#keyInput').value.trim();
-      if (!endpoint || !model || !key) {
-        toast('Completa endpoint, modelo y clave.');
-        return;
-      }
-      state.api = { endpoint, model, key };
-      state.mode = 'remote';
-      sessionStorage.setItem('movistarchat_api', JSON.stringify(state.api));
-      sessionStorage.setItem('movistarchat_mode', 'remote');
-      $('#settingsModal').classList.add('hidden');
-      $('#status').textContent = 'API conectada';
-      toast('AI configurada correctamente.');
-    }
-
-    function useLocal() {
-      state.mode = 'local';
-      state.api = null;
-      sessionStorage.setItem('movistarchat_mode', 'local');
-      sessionStorage.removeItem('movistarchat_api');
-      $('#settingsModal').classList.add('hidden');
-      $('#status').textContent = 'IA local sin clave';
-      toast('Modo local activado.');
-    }
-
-    function init() {
-      state.api = getApi();
-      state.mode = sessionStorage.getItem('movistarchat_mode') === 'remote' && state.api ? 'remote' : 'local';
-      drawCategories();
-      $('#status').textContent = state.mode === 'remote' ? 'API conectada' : 'IA local sin clave';
-      $('#startBtn').onclick = newCase;
-      $('#sendBtn').onclick = sendMessage;
-      $('#finishBtn').onclick = () => {
-        if (state.active) {
-          toast('Caso finalizado. Puedes empezar otro para practicar de nuevo.');
-          state.active = false;
-        }
-      };
-      $('#settingsBtn').onclick = () => {
-        $('#settingsModal').classList.remove('hidden');
-        $('#endpointInput').value = state.api?.endpoint || 'https://api.openai.com/v1/chat/completions';
-        $('#modelInput').value = state.api?.model || 'gpt-4o-mini';
-        $('#keyInput').value = state.api?.key || '';
-      };
-      $('#cancelSettings').onclick = () => $('#settingsModal').classList.add('hidden');
-      $('#saveSettings').onclick = saveSettings;
-      $('#messageInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          sendMessage();
-        }
-      });
-      newCase();
-    }
-
+    async function localAIReply(){await new Promise(r=>setTimeout(r,250));return fallbackReply()}
+    async function remoteAIReply(){const api=state.api;if(!api)throw new Error('Configura el endpoint, modelo y clave API.');const response=await fetch(api.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${api.key}`},body:JSON.stringify({model:api.model,messages:[{role:'system',content:customerSystemPrompt()},...state.messages.map(m=>({role:m.role==='agent'?'user':'assistant',content:m.content}))],temperature:.8,max_tokens:180})});if(!response.ok)throw new Error(`API error: ${response.status}`);const data=await response.json();const content=data.choices?.[0]?.message?.content?.trim();if(!content)throw new Error('La API no devolvió texto.');return content}
+    function newCase(){const s=scenarios[state.category];state.scenario={...s,name:names[Math.floor(Math.random()*names.length)]};state.messages=[];state.turns=0;state.active=true;$('#welcome').classList.add('hidden');$('#messages').innerHTML='';state.messages.push({role:'customer',content:state.scenario.opening});addMessage('customer',state.scenario.opening);state.turns=1;updateTurns();toast('Nuevo caso preparado.')}
+    async function sendMessage(){if(!state.active||state.busy)return;const input=$('#messageInput'),text=input.value.trim();if(!text)return;state.messages.push({role:'agent',content:text});addMessage('agent',text);input.value='';state.busy=true;state.turns++;updateTurns();let reply;try{reply=state.mode==='remote'?await remoteAIReply():await localAIReply()}catch(e){reply=fallbackReply();toast('No se pudo conectar con la IA. Se usará la respuesta local.')}state.messages.push({role:'customer',content:reply});addMessage('customer',reply);state.busy=false;updateTurns();if(state.turns>=20)toast('Conversación finalizada.')}
+    function saveSettings(){const endpoint=$('#endpointInput').value.trim(),model=$('#modelInput').value.trim(),key=$('#keyInput').value.trim();if(!endpoint||!model||!key){toast('Completa endpoint, modelo y clave.');return}state.api={endpoint,model,key};state.mode='remote';sessionStorage.setItem('movistarchat_api',JSON.stringify(state.api));sessionStorage.setItem('movistarchat_mode','remote');$('#settingsModal').classList.add('hidden');$('#status').textContent='API conectada';toast('IA configurada correctamente.')}
+    function init(){state.api=getApi();state.mode=sessionStorage.getItem('movistarchat_mode')==='remote'&&state.api?'remote':'local';drawCategories();$('#status').textContent=state.mode==='remote'?'API conectada':'IA local sin clave';$('#startBtn').onclick=newCase;$('#sendBtn').onclick=sendMessage;$('#finishBtn').onclick=()=>{if(state.active){toast('Caso finalizado. Puedes empezar otro para practicar de nuevo.');state.active=false;updateTurns()}};$('#settingsBtn').onclick=()=>{$('#settingsModal').classList.remove('hidden');$('#endpointInput').value=state.api?.endpoint||'https://api.openai.com/v1/chat/completions';$('#modelInput').value=state.api?.model||'gpt-4o-mini';$('#keyInput').value=state.api?.key||''};$('#cancelSettings').onclick=()=>$('#settingsModal').classList.add('hidden');$('#saveSettings').onclick=saveSettings;$('#messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});newCase()}
     init();
   </script>
 </body>
